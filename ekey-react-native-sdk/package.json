@@ -1,0 +1,30 @@
+{
+  "name": "ekey-react-native-sdk",
+  "version": "1.0.0",
+  "description": "eKey 2.0 app-to-app login for React Native (Android + iOS).",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "source": "src/index.ts",
+  "files": [
+    "src",
+    "android",
+    "ios",
+    "Frameworks",
+    "*.podspec",
+    "react-native.config.js",
+    "!android/build",
+    "!android/.gradle"
+  ],
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "react-native": "*"
+  },
+  "codegenConfig": {
+    "name": "EkeySdkSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.example.ekeysdk"
+    }
+  }
+}

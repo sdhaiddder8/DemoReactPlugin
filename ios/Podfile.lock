@@ -1,4 +1,26 @@
 PODS:
+  - ekey-react-native-sdk (1.0.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - FBLazyVector (0.86.2)
   - hermes-engine (250829098.0.16):
     - hermes-engine/Pre-built (= 250829098.0.16)
@@ -1895,6 +1917,7 @@ PODS:
   - Yoga (0.0.0)
 
 DEPENDENCIES:
+  - ekey-react-native-sdk (from `../node_modules/ekey-react-native-sdk`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -1974,6 +1997,8 @@ DEPENDENCIES:
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 EXTERNAL SOURCES:
+  ekey-react-native-sdk:
+    :path: "../node_modules/ekey-react-native-sdk"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   hermes-engine:
@@ -2129,6 +2154,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  ekey-react-native-sdk: 717f1f58bf0d3b80d190c316ad61b09631d06d40
   FBLazyVector: 3c3be9a019176b5699455f7f66c5444b78a411c6
   hermes-engine: 028d6ef6eaeefc4c7c8374416098fd25ffa03690
   RCTDeprecation: bccb6545c26db881ecddfd83a3f9ea82aba1605f
