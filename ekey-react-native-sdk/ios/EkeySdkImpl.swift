@@ -1,10 +1,10 @@
 import UIKit
-import EkeySDK
 
-/// Swift-side bridge between the ObjC++ Turbo Module (EkeySdkModule.mm) and the vendored
-/// EkeySDK.xcframework. Kept separate from the .mm file since EkeyLoginResult's
-/// associated-value enum cases aren't representable in Objective-C directly — this converts
-/// them to a plain NSDictionary the .mm file can hand straight to the JS promise resolver.
+/// Swift-side bridge between the ObjC++ Turbo Module (EkeySdkModule.mm) and EkeySDK (compiled
+/// from source alongside this file — see ios/EkeySDK/). Kept separate from the .mm file since
+/// EkeyLoginResult's associated-value enum cases aren't representable in Objective-C directly —
+/// this converts them to a plain NSDictionary the .mm file can hand straight to the JS promise
+/// resolver.
 @objc(EkeySdkImpl)
 public final class EkeySdkImpl: NSObject {
     @objc public static let shared = EkeySdkImpl()
