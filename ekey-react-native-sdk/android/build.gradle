@@ -33,7 +33,7 @@ if (isNewArchitectureEnabled()) {
 
 android {
     namespace "com.example.ekeysdk"
-    compileSdk getExtOrDefault('compileSdkVersion', 36)
+    compileSdk getExtOrDefault('compileSdkVersion', 35)
 
     defaultConfig {
         minSdkVersion getExtOrDefault('minSdkVersion', 24)
