@@ -33,7 +33,7 @@ if (isNewArchitectureEnabled()) {
 
 android {
     namespace "com.example.ekeysdk"
-    compileSdk getExtOrDefault('compileSdkVersion', 36)
+    compileSdk getExtOrDefault('compileSdkVersion', 35)
 
     defaultConfig {
         minSdkVersion getExtOrDefault('minSdkVersion', 24)
@@ -50,8 +50,6 @@ android {
 }
 
 dependencies {
-    implementation files("libs/EkeySDK.aar")
-
     implementation platform("androidx.compose:compose-bom:2024.09.00")
     implementation "androidx.activity:activity-compose:1.9.2"
     implementation "androidx.compose.material3:material3"
