@@ -1,6 +1,6 @@
 # eKey 2.0 — React Native Plugin Integration Guide
 
-This guide walks your team through adding eKey 2.0 app-to-app login to your React Native app. It's a true drop-in plugin now — almost everything lives inside one folder, and Android needs no manual wiring at all. No native development experience required, just follow the steps in order.
+This guide walks your team through adding eKey 2.0 app-to-app login to your React Native app. It's a true drop-in plugin — almost everything lives inside one folder, and Android needs no manual wiring at all. No native development experience required, just follow the steps in order.
 
 **What you're adding:** a single JavaScript function, `initiateEkeyLogin()`, that opens the eKey 2.0 login screen, hands off to the eKey app for authentication, and returns you an authorization code your backend can exchange for tokens.
 
@@ -12,7 +12,7 @@ This guide walks your team through adding eKey 2.0 app-to-app login to your Reac
 
 One folder: **`ekey-react-native-sdk/`**
 
-That's it. Everything — the Android module, the iOS module, the JS bridge, the build configuration — lives inside it. You won't need to copy loose files into your own `android/` or `ios/` folders, and you won't need to rename any packages or classes to match your app.
+That's it. Everything — the Android module, the iOS module, the JS bridge, the build configuration — lives inside it, as plain source code (Kotlin on Android, Swift on iOS — no prebuilt `.aar`/`.framework` binaries to manage). You won't need to copy loose files into your own `android/` or `ios/` folders, and you won't need to rename any packages or classes to match your app.
 
 ---
 
@@ -55,7 +55,7 @@ That single line is the only change needed in your `package.json`. No `codegenCo
 
 ## Step 3 — Android: nothing else to do
 
-If your app already has React Native's New Architecture enabled (`newArchEnabled=true` in `android/gradle.properties`), you're done. `npm install` was enough — the plugin registers itself automatically the same way any other React Native library does (like `react-native-safe-area-context`, if you're using it).
+If your app already has React Native's New Architecture enabled (`newArchEnabled=true` in `android/gradle.properties`), you're done. `npm install` was enough — the plugin registers itself automatically the same way any other React Native library does (like `react-native-safe-area-context`, if you're using it). The login screen's `Activity` and its `necekey://callback` handling are already declared inside the plugin's own manifest and merge into your app automatically.
 
 No edits to `settings.gradle`, `build.gradle`, or `MainApplication.kt` are required.
 
@@ -91,10 +91,12 @@ Open `ios/YourApp/Info.plist` and add:
 
 **4c. Forward the return URL to the SDK**
 
-In `AppDelegate.swift`, add the import at the top:
+The plugin's login SDK is written in Swift, but it works from either a Swift or an Objective-C `AppDelegate` — use whichever matches your project. In both cases you're calling the same thing, `EkeySdkImpl.shared.handleOpenURL(...)`; only the syntax differs.
+
+**If your `AppDelegate` is Swift** (`AppDelegate.swift`), add the import at the top:
 
 ```swift
-import EkeySDK
+import ekey_react_native_sdk
 ```
 
 ...and add this method inside your `AppDelegate` class:
@@ -105,10 +107,30 @@ func application(
   open url: URL,
   options: [UIApplication.OpenURLOptionsKey: Any] = [:]
 ) -> Bool {
-  Ekey.shared.handleOpenURL(url)
+  EkeySdkImpl.shared.handleOpenURL(url)
   return true
 }
 ```
+
+**If your `AppDelegate` is Objective-C** (`AppDelegate.m` — this must be a plain `.m` file, not `.mm`), add the import at the top:
+
+```objc
+@import ekey_react_native_sdk;
+```
+
+...and add this method inside your `AppDelegate` implementation:
+
+```objc
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
+{
+  [[EkeySdkImpl shared] handleOpenURL:url];
+  return YES;
+}
+```
+
+> Why `import`/`@import` and not a header `#import`? The SDK's Swift code doesn't publish a separate header file — `import`/`@import` pulls in the whole module (including the auto-generated Objective-C interface for `EkeySdkImpl`) in one step, for either language. If your `AppDelegate` is Objective-C++ (`.mm`) because of unrelated code elsewhere in your app, either split the eKey handling into its own plain `.m` file, or enable C++ module support for that file — `@import` doesn't work in `.mm` files with C++ modules off, which is Xcode's default.
 
 That's the full iOS setup — no manual Xcode project wiring, no dragging files into your target, no Swift Package configuration. CocoaPods handles linking automatically.
 
@@ -146,15 +168,16 @@ const onPress = async () => {
 
 ## Step 6 — Test it
 
-1. Run your app on both Android and iOS.
-2. Tap your button — the real eKey 2.0 login screen should open.
-3. Complete a login (or use the test/UAT tooling eKey provides) and confirm you get back a `completed` result with a URL containing a `code`.
+1. Start the Metro bundler in your project root (`npx react-native start`, or just use `npx react-native run-ios` / `run-android`, which starts it for you). If you skip this for a Debug build, the app opens to a red "No script URL provided" screen instead of your JS.
+2. Run your app on both Android and iOS.
+3. Tap your button — the real eKey 2.0 login screen should open.
+4. Complete a login (or use the test/UAT tooling eKey provides) and confirm you get back a `completed` result with a URL containing a `code`.
 
 ---
 
 ## Before going live
 
-- **Swap in your production credentials.** The plugin ships pointing at eKey's test/UAT environment. The `EkeySDK.xcframework` / `EkeySDK.aar` binaries inside the plugin have your credentials compiled in, so switching environments means asking us for a new build with your production `client_id` and `redirect_uri` — there's no config file to edit yourself.
+- **Swap in your production credentials.** The plugin ships pointing at eKey's test/UAT environment. Since the SDK is plain source now (not a prebuilt binary), your team — or ours — can update the `client_id`/`redirect_uri`/endpoint values directly in the plugin's source (`ekey-react-native-sdk/ios/EkeySDK/EkeyLoginConfig.swift` for iOS, `ekey-react-native-sdk/android/src/main/java/com/example/ekeysdk/EkeyLoginConfig.kt` for Android) rather than needing a whole new binary build from us.
 - **The SDK never sees your final tokens.** It only gets you as far as the authorization code. Exchanging that code for real access/ID tokens must happen on your backend, since it requires a client secret that must never ship inside a mobile app.
 - **Threading is already handled.** The plugin runs the login flow on the main thread internally — just call `initiateEkeyLogin()` from your normal UI code.
 
@@ -170,8 +193,14 @@ This is a bug in React Native 0.86.x's own codegen scripts — they don't handle
 **Android build fails with a CMake/native-build error mentioning "SDK XML versions"**
 Your Gradle daemon is running on too new a JDK (22+) for your installed Android Gradle Plugin version. Pin `android/gradle/gradle-daemon-jvm.properties` to `toolchainVersion=17`, and make sure a JDK 17 is installed (e.g. Temurin 17) somewhere Gradle can auto-detect it, such as `~/Library/Java/JavaVirtualMachines/` on macOS.
 
-**iOS build error: "No such module 'EkeySDK'"**
+**iOS build error: "No such module 'ekey_react_native_sdk'"**
 `pod install` hasn't run yet (or failed) against the plugin. Re-run step 4a and check the CocoaPods output for errors before rebuilding.
+
+**iOS build error: "use of '@import' when C++ modules are disabled"**
+Your `AppDelegate` is an Objective-C++ file (`.mm`) rather than plain Objective-C (`.m`). See the note at the end of step 4c.
+
+**iOS red screen: "No script URL provided... unsanitizedScriptURLString = (null)"**
+Metro isn't running. Start it with `npx react-native start` in your project root, then reload the app (⌘R on the red screen).
 
 **iOS crashes on tap with "UI API called on a background thread"**
 The plugin already guards against this internally. If you see it, make sure you copied the current version of the `ekey-react-native-sdk` folder rather than an older one.

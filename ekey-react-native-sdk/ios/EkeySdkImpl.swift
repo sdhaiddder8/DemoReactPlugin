@@ -34,6 +34,13 @@ public final class EkeySdkImpl: NSObject {
         }
     }
 
+    /// Forwards `application(_:open:options:)` from the host app's AppDelegate to EkeySDK's
+    /// `necekey://callback` handling. Exposed here (rather than requiring the app to import
+    /// EkeySDK directly) since EkeySDK now compiles as part of this pod, not a standalone module.
+    @objc @discardableResult public func handleOpenURL(_ url: URL) -> Bool {
+        Ekey.shared.handleOpenURL(url)
+    }
+
     private static func topViewController() -> UIViewController? {
         guard var top = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
