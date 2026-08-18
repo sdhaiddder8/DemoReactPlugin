@@ -1,10 +1,10 @@
 import UIKit
+import EkeySDK
 
-/// Swift-side bridge between the ObjC++ Turbo Module (EkeySdkModule.mm) and EkeySDK (compiled
-/// from source alongside this file — see ios/EkeySDK/). Kept separate from the .mm file since
-/// EkeyLoginResult's associated-value enum cases aren't representable in Objective-C directly —
-/// this converts them to a plain NSDictionary the .mm file can hand straight to the JS promise
-/// resolver.
+/// Swift-side bridge between the ObjC++ Turbo Module (EkeySdkModule.mm) and the vendored
+/// EkeySDK.xcframework. Kept separate from the .mm file since EkeyLoginResult's
+/// associated-value enum cases aren't representable in Objective-C directly — this converts
+/// them to a plain NSDictionary the .mm file can hand straight to the JS promise resolver.
 @objc(EkeySdkImpl)
 public final class EkeySdkImpl: NSObject {
     @objc public static let shared = EkeySdkImpl()
@@ -35,8 +35,8 @@ public final class EkeySdkImpl: NSObject {
     }
 
     /// Forwards `application(_:open:options:)` from the host app's AppDelegate to EkeySDK's
-    /// `necekey://callback` handling. Exposed here (rather than requiring the app to import
-    /// EkeySDK directly) since EkeySDK now compiles as part of this pod, not a standalone module.
+    /// `necekey://callback` handling. Exposed here (as @objc) so an Objective-C AppDelegate can
+    /// reach it — `Ekey` itself isn't @objc, so Objective-C can't call it directly.
     @objc @discardableResult public func handleOpenURL(_ url: URL) -> Bool {
         Ekey.shared.handleOpenURL(url)
     }

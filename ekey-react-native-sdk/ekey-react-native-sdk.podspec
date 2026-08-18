@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.platforms    = { ios: "14.0" }
   s.source       = { :path => "." }
   s.source_files = "ios/**/*.{swift,h,mm}"
+  s.vendored_frameworks = "Frameworks/EkeySDK.xcframework"
   # EkeySdkModule.h pulls in the codegen'd Obj-C++-only EkeySdkSpec.h. Keep it out of the
   # pod's public/umbrella header (generated because this pod also has Swift files), otherwise
   # Clang compiles the umbrella as plain Obj-C and trips the header's __cplusplus guard.

@@ -1,16 +1,15 @@
 #import "AppDelegate.h"
-
+@import ekey_react_native_sdk;
 #import <React/RCTBundleURLProvider.h>
 #import <React-RCTAppDelegate/RCTDefaultReactNativeFactoryDelegate.h>
 #import <React-RCTAppDelegate/RCTReactNativeFactory.h>
 #import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
 
-@import ekey_react_native_sdk;
-
 @interface ReactNativeDelegate : RCTDefaultReactNativeFactoryDelegate
 @end
 
 @implementation ReactNativeDelegate
+
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
@@ -37,6 +36,7 @@
 
 @implementation AppDelegate
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   ReactNativeDelegate *delegate = [ReactNativeDelegate new];
@@ -53,12 +53,10 @@
   return YES;
 }
 
-- (BOOL)application:(UIApplication *)app
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {
-  [[EkeySdkImpl shared] handleOpenURL:url];
-  return YES;
+[[EkeySdkImpl shared] handleOpenURL:url];
+return YES;
 }
 
 @end
